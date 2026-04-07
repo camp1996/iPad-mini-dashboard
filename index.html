@@ -11,7 +11,6 @@
             --glass-bg: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.2);
         }
-        /* Forzamos el fondo base a negro para tapar la barra blanca */
         html {
             background-color: #000; 
             height: 100%;
@@ -30,10 +29,11 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             color: white;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Moraine_Lake_17092005.jpg/1920px-Moraine_Lake_17092005.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            /* Transición suave al cambiar el fondo */
+            transition: background-image 3s ease-in-out;
         }
         .night-overlay {
             position: absolute;
@@ -124,6 +124,22 @@
     </div>
 
     <script>
+        const bodyElement = document.getElementById('body');
+
+        // --- SISTEMA DE FONDOS CON API ---
+        function changeBackground() {
+            // Añadimos la fecha actual al enlace para que la API entienda que queremos una foto distinta cada vez
+            const newImageUrl = `https://picsum.photos/1920/1080?random=${new Date().getTime()}`;
+            
+            // Precarga de imagen para evitar pantallas negras en el iPad
+            const img = new Image();
+            img.onload = function() {
+                bodyElement.style.backgroundImage = `url('${newImageUrl}')`;
+            };
+            img.src = newImageUrl;
+        }
+
+        // --- LÓGICA DEL DASHBOARD ---
         function updateDashboard() {
             const now = new Date();
             
@@ -134,11 +150,10 @@
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('date').textContent = now.toLocaleDateString('es-ES', options);
             
-            const body = document.getElementById('body');
             if (now.getHours() >= 0 && now.getHours() < 8) {
-                body.classList.add('is-night');
+                bodyElement.classList.add('is-night');
             } else {
-                body.classList.remove('is-night');
+                bodyElement.classList.remove('is-night');
             }
             
             let target = new Date(now.getFullYear(), 4, 23); 
@@ -161,10 +176,17 @@
             }
         }
 
+        // --- INICIADORES ---
         setInterval(updateDashboard, 1000);
         updateDashboard();
+        
         fetchWeather();
-        setInterval(fetchWeather, 1800000);
+        setInterval(fetchWeather, 1800000); // 30 min
+        
+        // Cargar primera imagen nada más empezar
+        changeBackground();
+        // Cambiar fondo cada 1 hora (3.600.000 milisegundos)
+        setInterval(changeBackground, 3600000); 
     </script>
 </body>
 </html>
