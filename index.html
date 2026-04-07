@@ -4,29 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Dashboard Escritorio</title>
+    <title>Dashboard Fútbol</title>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
-        #fondo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 1; transition: background-image 2s; opacity: 0.55; }
-        #contenedor { position: relative; z-index: 10; display: flex; width: 100%; height: 100%; color: white; }
         
-        /* Izquierda: Reloj */
-        #bloque-reloj { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-shadow: 0px 4px 15px rgba(0,0,0,0.8); }
-        #saludo { font-size: 2.2em; font-weight: 300; margin-bottom: -10px; color: #ccc; }
+        #fondo { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background-size: cover; background-position: center; 
+            z-index: 1; transition: background-image 2s ease-in-out; opacity: 0.55; 
+        }
+
+        #contenedor { 
+            position: relative; z-index: 10; display: flex; 
+            width: 100%; height: 100%; color: white; 
+        }
+
+        /* Lado Izquierdo: Reloj y Clima */
+        #bloque-reloj { 
+            flex: 1; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; 
+            text-shadow: 0px 4px 15px rgba(0,0,0,0.8); 
+            padding-left: 20px;
+        }
+        #saludo { font-size: 2.5em; font-weight: 300; margin-bottom: -10px; color: #ccc; }
         #reloj { font-size: 11em; font-weight: 200; margin: 0; letter-spacing: -4px; }
         #fecha { font-size: 2em; font-weight: 300; margin-top: 5px; color: #eee; }
         #clima { font-size: 2em; font-weight: 300; margin-top: 20px; color: #4CAF50; }
 
-        /* Derecha: Fútbol */
-        #bloque-futbol { width: 330px; display: flex; flex-direction: column; justify-content: center; padding-right: 25px; }
-        #panel { background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.15); border-radius: 25px; padding: 20px; max-height: 85vh; overflow-y: auto; }
+        /* Lado Derecho: Fútbol */
+        #bloque-futbol { 
+            width: 320px; display: flex; flex-direction: column; 
+            justify-content: center; padding-right: 25px; 
+        }
+        #panel { 
+            background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.15); 
+            border-radius: 25px; padding: 20px; max-height: 85vh; overflow-y: auto; 
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.5); 
+        }
         .titulo { font-size: 1.4em; font-weight: 400; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 12px; margin-bottom: 15px; }
+        
         .partido { margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .partido:last-child { border-bottom: none; }
         .liga { font-size: 0.7em; color: #888; text-transform: uppercase; margin-bottom: 2px; }
         .equipos { font-size: 0.95em; font-weight: 400; line-height: 1.3; }
         .hora { color: #4CAF50; font-size: 0.85em; font-weight: bold; margin-top: 4px; }
-        .mensaje { text-align: center; color: #777; font-size: 0.85em; font-style: italic; }
+        .mensaje { text-align: center; font-style: italic; color: #777; font-size: 0.85em; }
     </style>
 </head>
 <body>
@@ -43,23 +65,29 @@
 
         <div id="bloque-futbol">
             <div id="panel">
-                <div class="titulo">⚽ Fútbol Hoy</div>
+                <div class="titulo">⚽ Hoy</div>
                 <div id="lista-partidos">
-                    <div id="status-futbol" class="mensaje">Conectando...</div>
+                    <div class="mensaje">Conectando...</div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // TOKEN CONFIGURADO
+        var TOKEN = "938059db35794b3e9899b075719dd2d1";
+        
         function zero(n) { return n < 10 ? '0' + n : n; }
 
-        // 1. RELOJ Y FECHA
+        // 1. RELOJ
         function actualizarReloj() {
             var ahora = new Date();
             var h = ahora.getHours(), m = ahora.getMinutes();
-            document.getElementById('saludo').innerHTML = (h >= 6 && h < 13) ? "Buenos días" : (h >= 13 && h < 20) ? "Buenas tardes" : "Buenas noches";
+            var saludo = (h >= 6 && h < 13) ? "Buenos días" : (h >= 13 && h < 20) ? "Buenas tardes" : "Buenas noches";
+            
+            document.getElementById('saludo').innerHTML = saludo;
             document.getElementById('reloj').innerHTML = zero(h) + ":" + zero(m);
+            
             var dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
             var meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
             document.getElementById('fecha').innerHTML = dias[ahora.getDay()] + ", " + ahora.getDate() + " de " + meses[ahora.getMonth()];
@@ -68,16 +96,16 @@
         // 2. FONDO
         function actualizarFondo() {
             var h = new Date().getHours();
-            if (h >= 0 && h < 8) { document.getElementById('fondo').style.backgroundImage = "none"; }
-            else { document.getElementById('fondo').style.backgroundImage = "url('https://picsum.photos/1024/768/?random&t=" + new Date().getTime() + "')"; }
+            if (h >= 0 && h < 8) {
+                document.getElementById('fondo').style.backgroundImage = "none";
+            } else {
+                var url = "https://picsum.photos/1024/768/?random&t=" + new Date().getTime();
+                document.getElementById('fondo').style.backgroundImage = "url('" + url + "')";
+            }
         }
 
         // 3. CLIMA
         function actualizarClima() {
-            var script = document.createElement('script');
-            // Usamos JSONP para el clima también, así no hay bloqueos
-            script.src = "https://api.open-meteo.com/v1/forecast?latitude=36.4665&longitude=-6.1989&current_weather=true&format=json";
-            // Nota: Open-Meteo no requiere JSONP normalmente, pero lo haremos via XHR normal para simplificar
             var xhr = new XMLHttpRequest();
             xhr.open("GET", "https://api.open-meteo.com/v1/forecast?latitude=36.4665&longitude=-6.1989&current_weather=true", true);
             xhr.onreadystatechange = function() {
@@ -89,62 +117,58 @@
             xhr.send();
         }
 
-        // 4. EL MOTOR INDESTRUCTIBLE (JSONP via AllOrigins)
+        // 4. FÚTBOL (MÉTODO ULTRA-COMPATIBLE)
         function actualizarFutbol() {
-            var ahora = new Date();
-            var hoy = ahora.getFullYear() + "-" + zero(ahora.getMonth() + 1) + "-" + zero(ahora.getDate());
-            var urlSofa = "https://api.sofascore.com/api/v1/sport/football/scheduled-events/" + hoy;
-            
-            // Borramos cualquier intento anterior
-            var oldScript = document.getElementById('jsonp-futbol');
-            if (oldScript) oldScript.parentNode.removeChild(oldScript);
-
-            // Creamos la petición JSONP
-            var script = document.createElement('script');
-            script.id = 'jsonp-futbol';
-            // AllOrigins en modo callback engaña al navegador para que crea que es un script inofensivo
-            script.src = "https://api.allorigins.win/get?url=" + encodeURIComponent(urlSofa) + "&callback=procesarFutbol";
-            document.body.appendChild(script);
-        }
-
-        // Esta función recibe los datos del "túnel"
-        function procesarFutbol(data) {
             var contenedor = document.getElementById('lista-partidos');
-            try {
-                var datosSofa = JSON.parse(data.contents);
-                var eventos = datosSofa.events || [];
-                var html = "";
-                // Filtramos por las ligas que nos interesan
-                var ligasOK = ["champions", "laliga", "europa league", "conference league", "premier league"];
+            
+            // Usamos un proxy que reenvía cabeceras sin problemas
+            var urlOriginal = "https://api.football-data.org/v4/matches";
+            var urlProxy = "https://thingproxy.freeboard.io/fetch/" + urlOriginal;
 
-                for (var i = 0; i < eventos.length; i++) {
-                    var e = eventos[i];
-                    var nombreLiga = (e.tournament.name || "").toLowerCase();
-                    var coincide = false;
-                    for(var j=0; j<ligasOK.length; j++) {
-                        if(nombreLiga.indexOf(ligasOK[j]) !== -1) { coincide = true; break; }
-                    }
-
-                    if (coincide) {
-                        var fechaP = new Date(e.startTimestamp * 1000);
-                        var hP = zero(fechaP.getHours()) + ":" + zero(fechaP.getMinutes());
-                        html += '<div class="partido">' +
-                                '<div class="liga">' + e.tournament.name + '</div>' +
-                                '<div class="equipos">' + e.homeTeam.name + ' - ' + e.awayTeam.name + '</div>' +
-                                '<div class="hora">' + hP + '</div>' +
-                                '</div>';
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", urlProxy, true);
+            xhr.setRequestHeader("X-Auth-Token", TOKEN);
+            
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        var res = JSON.parse(xhr.responseText);
+                        var partidos = res.matches || [];
+                        var html = "";
+                        
+                        if (partidos.length === 0) {
+                            html = '<div class="mensaje">No hay partidos destacados para hoy.</div>';
+                        } else {
+                            // Filtramos solo ligas importantes para que no sea una lista infinita
+                            var ligasOK = ["UEFA Champions League", "Primera Division", "UEFA Europa League", "Premier League"];
+                            
+                            partidos.forEach(function(p) {
+                                if (ligasOK.indexOf(p.competition.name) !== -1) {
+                                    var fP = new Date(p.utcDate);
+                                    var hP = zero(fP.getHours()) + ":" + zero(fP.getMinutes());
+                                    html += '<div class="partido">' +
+                                            '<div class="liga">' + p.competition.name + '</div>' +
+                                            '<div class="equipos">' + p.homeTeam.shortName + ' - ' + p.awayTeam.shortName + '</div>' +
+                                            '<div class="hora">' + hP + '</div>' +
+                                            '</div>';
+                                }
+                            });
+                            if (html === "") html = '<div class="mensaje">Sin partidos de ligas principales hoy.</div>';
+                        }
+                        contenedor.innerHTML = html;
+                    } else {
+                        // Si da error, mostramos un mensaje útil
+                        contenedor.innerHTML = '<div class="mensaje">Error: ' + xhr.status + '.<br>Revisa el escudo de Vivaldi.</div>';
                     }
                 }
-                contenedor.innerHTML = html || '<div class="mensaje">No hay partidos destacados para hoy.</div>';
-            } catch (e) {
-                contenedor.innerHTML = '<div class="mensaje">Error al leer los datos deportivos.</div>';
-            }
+            };
+            xhr.send();
         }
 
         setInterval(actualizarReloj, 1000); actualizarReloj();
         setInterval(actualizarFondo, 600000); actualizarFondo();
         setInterval(actualizarClima, 1800000); actualizarClima();
-        setInterval(actualizarFutbol, 3600000); setTimeout(actualizarFutbol, 1500);
+        setInterval(actualizarFutbol, 3600000); setTimeout(actualizarFutbol, 1000);
     </script>
 </body>
 </html>
