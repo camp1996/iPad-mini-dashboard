@@ -11,15 +11,21 @@
             --glass-bg: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.2);
         }
-        /* Forzamos a ocupar el 100% físico de la pantalla sin scroll */
-        html, body {
+        /* Forzamos el fondo base a negro para tapar la barra blanca */
+        html {
+            background-color: #000; 
+            height: 100%;
+            width: 100%;
+        }
+        body {
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 100%;
+            height: 100vh;
             position: fixed;
             top: 0;
             left: 0;
+            bottom: 0;
             overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             color: white;
@@ -52,7 +58,6 @@
             box-sizing: border-box;
         }
         .time {
-            /* Hora aún más gigante */
             font-size: 35vw; 
             font-weight: 200;
             letter-spacing: -8px;
