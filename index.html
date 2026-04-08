@@ -3,77 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
     <title>Dashboard iPad</title>
+
     <style>
+        /* RESET Y FONDO */
         html, body { background-color: #000; margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden; }
         body {
             color: #ffffff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
             background-size: cover;
             background-position: center;
             transition: background-image 1.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
+        /* CAPA OSCURA DE CONTRASTE */
         .overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.45); 
+            background: linear-gradient(90deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%);
             z-index: 1;
         }
 
-        .content-layer { position: relative; z-index: 10; width: 92%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        /* ETIQUETA DE LA FOTO */
+        .nasa-title { position: absolute; top: 20px; left: 20px; font-size: 0.8rem; color: rgba(255,255,255,0.4); z-index: 10;}
 
-        .nasa-title { position: absolute; top: 20px; left: 0; font-size: 0.8rem; color: rgba(255,255,255,0.4); }
-
-        /* RELOJ */
-        .center-clock { display: flex; flex-direction: column; align-items: center; margin-top: -120px; text-shadow: 0 10px 40px rgba(0,0,0,0.9); }
-        #clock { font-size: 14rem; font-weight: 700; letter-spacing: -5px; margin: 0; line-height: 1; }
-        #date { font-size: 2.2rem; color: #d4d4d8; font-weight: 300; margin-top: 5px; }
-        #countdown {
-            font-size: 1.1rem; color: #ff9f0a; font-weight: 500; margin-top: 15px;
-            background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-            padding: 6px 18px; border-radius: 20px; border: 1px solid rgba(255, 159, 10, 0.4); text-transform: lowercase;
+        /* ESTRUCTURA PRINCIPAL (ASIMÉTRICA) */
+        .main-layout {
+            position: relative;
+            z-index: 10;
+            width: 94%;
+            height: 90%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* WIDGETS */
-        .bottom-widgets { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: space-between; align-items: flex-end; }
-        .glass-card { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; box-sizing: border-box; width: 360px; }
+        /* COLUMNA IZQUIERDA (HORA Y FECHA) */
+        .left-column {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
 
-        .podcast-tabs { display: flex; justify-content: space-between; margin-bottom: 20px; gap: 10px; }
-        .tab-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 10px 6px; border-radius: 10px; font-size: 0.8rem; flex-grow: 1; text-align: center; cursor: pointer; }
-        .tab-btn.active { background: rgba(255, 255, 255, 0.3); font-weight: bold; }
+        /* HORA GIGANTE CON TRANSPARENCIA */
+        #clock { 
+            font-size: 14rem; 
+            font-weight: 700; 
+            letter-spacing: -6px; 
+            margin: 0; 
+            line-height: 1;
+            color: rgba(255, 255, 255, 0.85); /* Semitransparente */
+            text-shadow: 0 8px 30px rgba(0,0,0,0.8); /* Sombra dura para que resalte sobre cualquier fondo */
+        }
+        
+        #date { 
+            font-size: 2.2rem; 
+            color: #e4e4e7; 
+            font-weight: 400; 
+            margin-top: 10px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.8);
+        }
+
+        #countdown {
+            font-size: 1.2rem; 
+            color: #ff9f0a; 
+            font-weight: 500; 
+            margin-top: 20px;
+            text-transform: lowercase;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+        }
+
+        /* COLUMNA DERECHA (TARJETAS) */
+        .right-column {
+            width: 360px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Separación entre las tres tarjetas */
+            flex-shrink: 0;
+        }
+
+        /* ESTILO COMÚN DE LAS TARJETAS DE CRISTAL */
+        .glass-card { 
+            background: rgba(0, 0, 0, 0.45); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            border-radius: 25px; 
+            border: 1px solid rgba(255, 255, 255, 0.15); 
+            padding: 20px; 
+            box-sizing: border-box; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* TARJETA 2: NOTICIAS */
+        .card-title {
+            font-size: 0.8rem;
+            color: #a1a1aa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        #news-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .news-item {
+            font-size: 0.95rem;
+            color: #f4f4f5;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .news-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+        /* TARJETA 3: PODCASTS */
+        .podcast-tabs { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 8px; }
+        .tab-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; padding: 8px 4px; border-radius: 8px; font-size: 0.75rem; flex-grow: 1; text-align: center; cursor: pointer; transition: all 0.2s;}
+        .tab-btn.active { background: rgba(255, 159, 10, 0.8); color: #000; font-weight: bold; border: none; } /* Botón activo en color naranja iOS */
 
         #podcast-content { display: none; flex-direction: column; width: 100%; }
-        .podcast-info { display: flex; flex-direction: row; align-items: center; gap: 18px; margin-bottom: 15px; }
-        #podcast-img { width: 85px; height: 85px; border-radius: 15px; object-fit: cover; }
-        #episode-title { font-size: 0.95rem; color: #e4e4e7; margin: 0; line-height: 1.4; text-align: left; }
-        audio { width: 100%; height: 40px; }
+        .podcast-info { display: flex; flex-direction: row; align-items: center; gap: 15px; margin-bottom: 12px; }
+        #podcast-img { width: 70px; height: 70px; border-radius: 12px; object-fit: cover; }
+        #episode-title { font-size: 0.9rem; color: #e4e4e7; margin: 0; line-height: 1.3; text-align: left; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;}
+        audio { width: 100%; height: 35px; outline: none;}
     </style>
 </head>
 <body>
 
     <div class="overlay"></div>
+    <div id="nasa-title" class="nasa-title">paisaje diario (unsplash)</div>
 
-    <div class="content-layer">
-        <div id="nasa-title" class="nasa-title">paisaje diario</div>
-
-        <div class="center-clock">
+    <div class="main-layout">
+        
+        <div class="left-column">
             <div id="clock">--:--</div>
             <div id="date">cargando...</div>
             <div id="countdown">...</div>
         </div>
 
-        <div class="bottom-widgets">
-            <div class="glass-card">
+        <div class="right-column">
+            
+            <div class="glass-card" style="padding: 15px 20px;">
                 <a class="weatherwidget-io" href="https://forecast7.com/es/36d47n6d20/san-fernando/" data-label_1="SAN FERNANDO" data-mode="Current" data-font="Helvetica" data-icons="Climacons Animated" data-theme="dark" data-basecolor="rgba(0,0,0,0)" >TIEMPO</a>
                 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');</script>
+            </div>
+
+            <div class="glass-card">
+                <div class="card-title">NOTICIAS DE ESPAÑA</div>
+                <div id="news-content" style="color:#aaa; font-size:0.8rem;">Cargando titulares...</div>
             </div>
 
             <div class="glass-card">
@@ -82,7 +178,7 @@
                     <button class="tab-btn" onclick="loadPodcast('1642338651', this)">Chiclana</button>
                     <button class="tab-btn" onclick="loadPodcast('359611484', this)">Reload</button>
                 </div>
-                <div id="podcast-loader" style="color:#aaa; font-size:0.9rem; text-align:center;">buscando...</div>
+                <div id="podcast-loader" style="color:#aaa; font-size:0.8rem; text-align:center;">buscando episodio...</div>
                 <div id="podcast-content">
                     <div class="podcast-info">
                         <img id="podcast-img" src="" alt="">
@@ -91,6 +187,7 @@
                     <audio id="audio-player" controls></audio>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -114,16 +211,40 @@
         setInterval(updateAll, 1000);
         updateAll();
 
-        // 2. IMAGEN DE FONDO (Unsplash Nativo)
+        // 2. IMAGEN DE FONDO (Unsplash Nativo Diario)
         function setBg() {
             var d = new Date();
             var seed = d.getDate() + d.getMonth() + d.getFullYear();
-            var url = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=2000&q=80&sig=" + seed;
-            document.body.style.backgroundImage = "url('" + url + "')";
+            var url = "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=2048&q=80&sig=" + seed;
+            
+            // Usamos una URL fija temporal de muy alta calidad espacial como base segura, 
+            // pero que cambia sutilmente con la semilla si se usan colecciones.
+            document.body.style.backgroundImage = "url('https://images.unsplash.com/featured/?space,stars&sig=" + seed + "')";
         }
         setBg();
 
-        // 3. PODCASTS
+        // 3. NOTICIAS DE ESPAÑA (El País RSS)
+        async function loadNews() {
+            try {
+                // Feed de El País España
+                var rssUrl = 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/espana/portada';
+                var res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(rssUrl));
+                var data = await res.json();
+                
+                var html = '';
+                // Mostrar los 2 primeros titulares
+                for(var i=0; i<2; i++) {
+                    html += '<div class="news-item">' + data.items[i].title + '</div>';
+                }
+                document.getElementById('news-content').innerHTML = html;
+            } catch(e) {
+                document.getElementById('news-content').innerHTML = "No se pudieron cargar las noticias.";
+            }
+        }
+        loadNews();
+        setInterval(loadNews, 3600000); // Actualizar noticias cada hora (3600000 ms)
+
+        // 4. PODCASTS
         async function loadPodcast(id, btn) {
             if(btn) {
                 var btns = document.getElementsByClassName('tab-btn');
@@ -133,6 +254,7 @@
             
             document.getElementById('podcast-loader').style.display = 'block';
             document.getElementById('podcast-content').style.display = 'none';
+            document.getElementById('audio-player').pause();
             
             try {
                 var r1 = await fetch("https://itunes.apple.com/lookup?id=" + id);
@@ -149,9 +271,10 @@
                 document.getElementById('episode-title').innerHTML = d2.items[0].title;
                 document.getElementById('audio-player').src = d2.items[0].enclosure.link;
             } catch(e) {
-                document.getElementById('podcast-loader').innerHTML = "error de conexión";
+                document.getElementById('podcast-loader').innerHTML = "Error al conectar con Apple Podcasts";
             }
         }
+        // Carga Inicial
         loadPodcast('1570234432', null);
     </script>
 </body>
