@@ -2,166 +2,167 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Dashboard Mini (Reloj Grande)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard iPad</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+        /* Fondo base y capa oscura */
+        body {
             background-color: #000;
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        }
-
-        #fondo {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            z-index: 1;
-            transition: background-image 2s ease-in-out; 
-        }
-
-        #filtro-oscuro {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.45);
-            z-index: 2;
-        }
-
-        #contenido {
-            position: relative;
-            z-index: 3;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
+            margin: 0;
+            height: 100vh;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             justify-content: center;
             align-items: center;
-            height: 100%;
-            color: #ffffff;
-            text-shadow: 0px 4px 15px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 2s ease-in-out;
+            gap: 40px; /* Separación entre el reloj y los podcasts */
         }
 
-        #saludo {
-            font-size: 2.5em;
-            font-weight: 300;
-            margin-bottom: -15px; /* Ajustado para el nuevo tamaño del reloj */
-            color: #d1d1d1;
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: -1;
         }
 
-        /* --- AQUÍ ESTÁ EL CAMBIO PRINCIPAL --- */
-        #reloj {
-            font-size: 14em; /* Tamaño gigante */
-            font-weight: 200;
-            margin: 0;
-            line-height: 1.1;
-            letter-spacing: -3px;
-        }
-
-        #fecha {
-            font-size: 2.2em;
-            font-weight: 300;
-            margin-top: 5px; /* Ajustado para el nuevo tamaño del reloj */
-            color: #f0f0f0;
-        }
-
-        #clima {
-            font-size: 2em;
-            font-weight: 300;
-            margin-top: 20px;
-            color: #e0e0e0;
+        /* Tarjeta Izquierda: Reloj y Tiempo */
+        .dashboard-card {
             display: flex;
+            flex-direction: column;
             align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 40px 60px;
+            border-radius: 35px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Tarjeta Derecha: Podcasts */
+        .podcast-card {
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 20px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 350px;
+        }
+
+        /* Botones para cambiar de podcast */
+        .podcast-tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
             gap: 10px;
         }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            flex-grow: 1;
+            transition: background 0.3s;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+            font-weight: bold;
+        }
+
+        #greeting { font-size: 1.5rem; color: #e4e4e7; font-weight: 500; margin-bottom: -10px;}
+        #clock { font-size: 7rem; font-weight: 700; letter-spacing: -2px; margin: 0; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        #date { font-size: 1.5rem; color: #d4d4d8; font-weight: 400; text-transform: capitalize; margin-bottom: 20px; }
+        
+        .weather-container { width: 300px; }
+        .nasa-title { position: absolute; bottom: 20px; left: 20px; font-size: 0.8rem; color: rgba(255,255,255,0.6); max-width: 50%; }
     </style>
 </head>
 <body>
 
-    <div id="fondo"></div>
-    <div id="filtro-oscuro"></div>
-    
-    <div id="contenido">
-        <div id="saludo">Hola</div>
-        <div id="reloj">--:--</div>
-        <div id="fecha">Cargando...</div>
-        <div id="clima">Cargando clima...</div>
+    <div class="overlay"></div>
+    <div id="nasa-title" class="nasa-title">Cargando imagen...</div>
+
+    <div class="dashboard-card">
+        <div id="greeting">Hola</div>
+        <div id="clock">00:00</div>
+        <div id="date">Cargando fecha...</div>
+        <div class="weather-container">
+            <a class="weatherwidget-io" href="https://forecast7.com/es/36d47n6d20/san-fernando/" data-label_1="SAN FERNANDO" data-label_2="EL TIEMPO" data-font="Helvetica" data-icons="Climacons Animated" data-theme="dark" data-basecolor="rgba(0,0,0,0)" >SAN FERNANDO EL TIEMPO</a>
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');</script>
+        </div>
+    </div>
+
+    <div class="podcast-card">
+        <div class="podcast-tabs">
+            <button class="tab-btn active" onclick="changePodcast('https://podcasts.apple.com/es/podcast/podcast-reload/id359611484?theme=dark', this)">Videojuegos</button>
+            <button class="tab-btn" onclick="changePodcast('https://podcasts.apple.com/es/podcast/chiclana-friends/id1642338651?theme=dark', this)">Podcast</button>
+            <button class="tab-btn" onclick="changePodcast('https://podcasts.apple.com/es/podcast/recarga-activa/id1570234432?theme=dark', this)">Tecnología</button>
+        </div>
+
+        <iframe id="podcast-player" allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="400" style="width:100%;max-width:660px;overflow:hidden;background:transparent;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.podcasts.apple.com/es/podcast/entiende-tu-mente/id1229953835?theme=dark"></iframe>
     </div>
 
     <script>
-        function actualizarReloj() {
-            var ahora = new Date();
-            var horas = ahora.getHours();
-            var minutos = ahora.getMinutes();
-            
-            var textoSaludo = "Buenas noches";
-            if (horas >= 6 && horas < 13) { textoSaludo = "Buenos días"; }
-            else if (horas >= 13 && horas < 20) { textoSaludo = "Buenas tardes"; }
-            document.getElementById('saludo').innerHTML = textoSaludo;
+        // Actualizar Reloj
+        function updateTime() {
+            const now = new Date();
+            let hours = now.getHours().toString().padStart(2, '0');
+            let minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}`;
 
-            if (horas < 10) { horas = "0" + horas; }
-            if (minutos < 10) { minutos = "0" + minutos; }
-            document.getElementById('reloj').innerHTML = horas + ":" + minutos;
+            const options = { weekday: 'long', month: 'long', day: 'numeric' };
+            let dateString = now.toLocaleDateString('es-ES', options);
+            document.getElementById('date').textContent = dateString;
 
-            var opciones = { weekday: 'long', month: 'long', day: 'numeric' };
-            var fechaFormateada = ahora.toLocaleDateString('es-ES', opciones);
-            fechaFormateada = fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
-            document.getElementById('fecha').innerHTML = fechaFormateada;
+            const currentHour = now.getHours();
+            let greeting = 'Buenas noches';
+            if (currentHour >= 6 && currentHour < 13) { greeting = 'Buenos días'; } 
+            else if (currentHour >= 13 && currentHour < 20) { greeting = 'Buenas tardes'; }
+            document.getElementById('greeting').textContent = greeting;
         }
+        setInterval(updateTime, 1000); updateTime();
 
-        function actualizarFondo() {
-            var urlFoto = "https://picsum.photos/2048/1536/?random&t=" + new Date().getTime();
-            document.getElementById('fondo').style.backgroundImage = "url('" + urlFoto + "')";
-        }
-
-        function interpretarClima(codigo) {
-            if (codigo === 0) return "☀️"; 
-            if (codigo === 1 || codigo === 2 || codigo === 3) return "⛅";
-            if (codigo === 45 || codigo === 48) return "🌫️";
-            if (codigo >= 51 && codigo <= 67) return "🌧️";
-            if (codigo >= 71 && codigo <= 77) return "❄️";
-            if (codigo >= 80 && codigo <= 82) return "🌦️";
-            if (codigo >= 95) return "⛈️";
-            return "🌡️";
-        }
-
-        function actualizarClima() {
-            var lat = 36.4665;
-            var lon = -6.1989;
-            var url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current_weather=true";
-
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", url, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    var datos = JSON.parse(xhr.responseText);
-                    var temperatura = Math.round(datos.current_weather.temperature);
-                    var icono = interpretarClima(datos.current_weather.weathercode);
-                    document.getElementById('clima').innerHTML = icono + " " + temperatura + "°C";
+        // Obtener Imagen NASA
+        async function fetchNasaImage() {
+            try {
+                const response = await fetch('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY');
+                const data = await response.json();
+                if(data.media_type === 'image') {
+                    document.body.style.backgroundImage = `url('${data.hdurl || data.url}')`;
+                    document.getElementById('nasa-title').textContent = "NASA APOD: " + data.title;
+                } else {
+                    document.body.style.backgroundImage = `url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2000&auto=format&fit=crop')`;
+                    document.getElementById('nasa-title').textContent = "Imagen espacial";
                 }
-            };
-            xhr.send();
+            } catch (error) { console.log("Error API NASA", error); }
         }
-        
-        setInterval(actualizarReloj, 1000);
-        actualizarReloj();
+        fetchNasaImage(); setInterval(fetchNasaImage, 12 * 60 * 60 * 1000);
 
-        setInterval(actualizarFondo, 600000);
-        actualizarFondo();
-
-        setInterval(actualizarClima, 1800000);
-        actualizarClima();
-
+        // Cambiar de Podcast
+        function changePodcast(url, buttonElement) {
+            // Cambiar la URL del iframe
+            document.getElementById('podcast-player').src = url;
+            
+            // Quitar la clase 'active' de todos los botones
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Poner la clase 'active' al botón pulsado para que brille más
+            buttonElement.classList.add('active');
+        }
     </script>
-
 </body>
 </html>
