@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Dashboard Mini iPad</title>
+    <title>Dashboard Mini (Reloj Grande)</title>
     <style>
         body, html {
             margin: 0;
@@ -54,12 +54,13 @@
         #saludo {
             font-size: 2.5em;
             font-weight: 300;
-            margin-bottom: -15px;
+            margin-bottom: -15px; /* Ajustado para el nuevo tamaño del reloj */
             color: #d1d1d1;
         }
 
+        /* --- AQUÍ ESTÁ EL CAMBIO PRINCIPAL --- */
         #reloj {
-            font-size: 14em;
+            font-size: 14em; /* Tamaño gigante */
             font-weight: 200;
             margin: 0;
             line-height: 1.1;
@@ -69,18 +70,8 @@
         #fecha {
             font-size: 2.2em;
             font-weight: 300;
-            margin-top: 5px;
+            margin-top: 5px; /* Ajustado para el nuevo tamaño del reloj */
             color: #f0f0f0;
-        }
-
-        #cuenta-atras {
-            font-size: 1.5em;
-            font-weight: 300;
-            margin-top: 15px;
-            color: #e0e0e0;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 8px 18px;
-            border-radius: 20px;
         }
 
         #clima {
@@ -88,11 +79,9 @@
             font-weight: 300;
             margin-top: 20px;
             color: #e0e0e0;
-            /* Eliminado el 'gap' que da problemas en iOS antiguo */
-        }
-        
-        #icono-clima {
-            margin-right: 10px; /* Alternativa compatible al gap */
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
     </style>
 </head>
@@ -104,18 +93,11 @@
     <div id="contenido">
         <div id="saludo">Hola</div>
         <div id="reloj">--:--</div>
-        <div id="fecha">Iniciando sistema...</div>
-        <div id="cuenta-atras">Calculando días...</div>
-        <div id="clima"><span id="icono-clima"></span><span id="texto-clima">Cargando clima...</span></div>
+        <div id="fecha">Cargando...</div>
+        <div id="clima">Cargando clima...</div>
     </div>
 
     <script>
-        // CHIVATO DE ERRORES PARA EL IPAD
-        window.onerror = function(mensaje, url, linea) {
-            document.getElementById('fecha').innerHTML = "Error línea " + linea + ": " + mensaje;
-            return false;
-        };
-
         function actualizarReloj() {
             var ahora = new Date();
             var horas = ahora.getHours();
@@ -132,31 +114,8 @@
 
             var opciones = { weekday: 'long', month: 'long', day: 'numeric' };
             var fechaFormateada = ahora.toLocaleDateString('es-ES', opciones);
-            // Hacemos la primera letra mayúscula de forma segura
             fechaFormateada = fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
             document.getElementById('fecha').innerHTML = fechaFormateada;
-        }
-
-        function actualizarCuentaAtras() {
-            var fechaObjetivo = new Date(2026, 4, 23); 
-            var ahora = new Date();
-            
-            ahora.setHours(0, 0, 0, 0);
-            fechaObjetivo.setHours(0, 0, 0, 0);
-
-            var diferenciaTiempo = fechaObjetivo.getTime() - ahora.getTime();
-            var diasRestantes = Math.floor(diferenciaTiempo / (1000 * 60 * 60 * 24));
-
-            var elemento = document.getElementById('cuenta-atras');
-            if (diasRestantes > 1) {
-                elemento.innerHTML = "⏳ Faltan " + diasRestantes + " días para el 23 de mayo";
-            } else if (diasRestantes === 1) {
-                elemento.innerHTML = "⏳ Falta 1 día para el 23 de mayo";
-            } else if (diasRestantes === 0) {
-                elemento.innerHTML = "🎉 ¡Hoy es 23 de mayo de 2026!";
-            } else {
-                elemento.innerHTML = "⌛ El 23 de mayo ya pasó";
-            }
         }
 
         function actualizarFondo() {
@@ -172,3 +131,37 @@
             if (codigo >= 71 && codigo <= 77) return "❄️";
             if (codigo >= 80 && codigo <= 82) return "🌦️";
             if (codigo >= 95) return "⛈️";
+            return "🌡️";
+        }
+
+        function actualizarClima() {
+            var lat = 36.4665;
+            var lon = -6.1989;
+            var url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current_weather=true";
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var datos = JSON.parse(xhr.responseText);
+                    var temperatura = Math.round(datos.current_weather.temperature);
+                    var icono = interpretarClima(datos.current_weather.weathercode);
+                    document.getElementById('clima').innerHTML = icono + " " + temperatura + "°C";
+                }
+            };
+            xhr.send();
+        }
+        
+        setInterval(actualizarReloj, 1000);
+        actualizarReloj();
+
+        setInterval(actualizarFondo, 600000);
+        actualizarFondo();
+
+        setInterval(actualizarClima, 1800000);
+        actualizarClima();
+
+    </script>
+
+</body>
+</html>
