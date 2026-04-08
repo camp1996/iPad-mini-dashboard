@@ -2,191 +2,174 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Dashboard</title>
+    <title>Dashboard Mini (Reloj Grande)</title>
     <style>
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-        }
-        html {
-            background-color: #000; 
-            height: 100%;
-            width: 100%;
-        }
-        body {
+        body, html {
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 100vh;
-            position: fixed;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        #fondo {
+            position: absolute;
             top: 0;
             left: 0;
-            bottom: 0;
-            overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: white;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
+            width: 100%;
+            height: 100%;
             background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
-            /* Transición suave al cambiar el fondo */
-            transition: background-image 3s ease-in-out;
-        }
-        .night-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: black;
-            opacity: 0;
-            transition: opacity 2s ease-in-out;
             z-index: 1;
+            transition: background-image 2s ease-in-out; 
         }
-        body.is-night .night-overlay {
-            opacity: 1;
-        }
-        .container {
+
+        #filtro-oscuro {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 2;
+        }
+
+        #contenido {
+            position: relative;
+            z-index: 3;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 2;
-            padding: 20px;
-            box-sizing: border-box;
+            height: 100%;
+            color: #ffffff;
+            text-shadow: 0px 4px 15px rgba(0, 0, 0, 0.8);
         }
-        .time {
-            font-size: 35vw; 
-            font-weight: 200;
-            letter-spacing: -8px;
-            text-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            margin: 0;
-            line-height: 0.85;
-        }
-        .date {
-            font-size: 4vw;
+
+        #saludo {
+            font-size: 2.5em;
             font-weight: 300;
-            text-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            text-transform: capitalize;
-            margin-bottom: 30px;
-            margin-top: 10px;
+            margin-bottom: -15px;
+            color: #d1d1d1;
         }
-        .widgets {
-            display: flex;
-            gap: 25px;
-            justify-content: center;
-            margin-top: 20px;
-            width: 100%;
-        }
-        .widget {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 20px 35px;
-            min-width: 160px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-        .widget-title {
-            font-size: 1.5vw;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.8;
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-        .widget-value {
-            font-size: 4.5vw;
+
+        #reloj {
+            font-size: 14em;
             font-weight: 200;
+            margin: 0;
+            line-height: 1.1;
+            letter-spacing: -3px;
+        }
+
+        #fecha {
+            font-size: 2.2em;
+            font-weight: 300;
+            margin-top: 5px;
+            color: #f0f0f0;
+        }
+
+        /* --- NUEVO ESTILO PARA LA CUENTA ATRÁS --- */
+        #cuenta-atras {
+            font-size: 1.5em;
+            font-weight: 300;
+            margin-top: 15px;
+            color: #e0e0e0;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 18px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        #clima {
+            font-size: 2em;
+            font-weight: 300;
+            margin-top: 20px;
+            color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
     </style>
 </head>
-<body id="body">
-    <div class="night-overlay" id="overlay"></div>
-    <div class="container">
-        <div class="time" id="time">00:00</div>
-        <div class="date" id="date">Cargando...</div>
-        
-        <div class="widgets">
-            <div class="widget">
-                <div class="widget-title">El Tiempo</div>
-                <div class="widget-value" id="weather">--°C</div>
-            </div>
-            <div class="widget">
-                <div class="widget-title">23 de Mayo</div>
-                <div class="widget-value"><span id="countdown">--</span> días</div>
-            </div>
-        </div>
+<body>
+
+    <div id="fondo"></div>
+    <div id="filtro-oscuro"></div>
+    
+    <div id="contenido">
+        <div id="saludo">Hola</div>
+        <div id="reloj">--:--</div>
+        <div id="fecha">Cargando...</div>
+        <div id="cuenta-atras">Calculando días...</div>
+        <div id="clima">Cargando clima...</div>
     </div>
 
     <script>
-        const bodyElement = document.getElementById('body');
-
-        // --- SISTEMA DE FONDOS CON API ---
-        function changeBackground() {
-            // Añadimos la fecha actual al enlace para que la API entienda que queremos una foto distinta cada vez
-            const newImageUrl = `https://picsum.photos/1920/1080?random=${new Date().getTime()}`;
+        function actualizarReloj() {
+            var ahora = new Date();
+            var horas = ahora.getHours();
+            var minutos = ahora.getMinutes();
             
-            // Precarga de imagen para evitar pantallas negras en el iPad
-            const img = new Image();
-            img.onload = function() {
-                bodyElement.style.backgroundImage = `url('${newImageUrl}')`;
-            };
-            img.src = newImageUrl;
+            var textoSaludo = "Buenas noches";
+            if (horas >= 6 && horas < 13) { textoSaludo = "Buenos días"; }
+            else if (horas >= 13 && horas < 20) { textoSaludo = "Buenas tardes"; }
+            document.getElementById('saludo').innerHTML = textoSaludo;
+
+            if (horas < 10) { horas = "0" + horas; }
+            if (minutos < 10) { minutos = "0" + minutos; }
+            document.getElementById('reloj').innerHTML = horas + ":" + minutos;
+
+            var opciones = { weekday: 'long', month: 'long', day: 'numeric' };
+            var fechaFormateada = ahora.toLocaleDateString('es-ES', opciones);
+            fechaFormateada = fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
+            document.getElementById('fecha').innerHTML = fechaFormateada;
         }
 
-        // --- LÓGICA DEL DASHBOARD ---
-        function updateDashboard() {
-            const now = new Date();
+        // --- NUEVA FUNCIÓN PARA LA CUENTA ATRÁS ---
+        function actualizarCuentaAtras() {
+            // El mes en JavaScript va de 0 (Enero) a 11 (Diciembre), por eso Mayo es el 4.
+            var fechaObjetivo = new Date(2026, 4, 23); 
+            var ahora = new Date();
             
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('time').textContent = `${hours}:${minutes}`;
-            
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('date').textContent = now.toLocaleDateString('es-ES', options);
-            
-            if (now.getHours() >= 0 && now.getHours() < 8) {
-                bodyElement.classList.add('is-night');
+            // Ignoramos las horas para calcular solo días exactos de diferencia
+            ahora.setHours(0, 0, 0, 0);
+            fechaObjetivo.setHours(0, 0, 0, 0);
+
+            var diferenciaTiempo = fechaObjetivo.getTime() - ahora.getTime();
+            var diasRestantes = Math.floor(diferenciaTiempo / (1000 * 60 * 60 * 24));
+
+            var elemento = document.getElementById('cuenta-atras');
+            if (diasRestantes > 1) {
+                elemento.innerHTML = "⏳ Faltan " + diasRestantes + " días para el 23 de mayo";
+            } else if (diasRestantes === 1) {
+                elemento.innerHTML = "⏳ Falta 1 día para el 23 de mayo";
+            } else if (diasRestantes === 0) {
+                elemento.innerHTML = "🎉 ¡Hoy es 23 de mayo de 2026!";
             } else {
-                bodyElement.classList.remove('is-night');
-            }
-            
-            let target = new Date(now.getFullYear(), 4, 23); 
-            if (now.getTime() > target.getTime() && now.getDate() !== 23) {
-                target.setFullYear(now.getFullYear() + 1);
-            }
-            const diffTime = target - now;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            document.getElementById('countdown').textContent = diffDays;
-        }
-
-        async function fetchWeather() {
-            try {
-                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=36.4667&longitude=-6.1983&current_weather=true');
-                const data = await res.json();
-                const temp = Math.round(data.current_weather.temperature);
-                document.getElementById('weather').textContent = `${temp}°C`;
-            } catch (e) {
-                document.getElementById('weather').textContent = '—°C';
+                elemento.innerHTML = "⌛ El 23 de mayo de 2026 ya pasó";
             }
         }
 
-        // --- INICIADORES ---
-        setInterval(updateDashboard, 1000);
-        updateDashboard();
-        
-        fetchWeather();
-        setInterval(fetchWeather, 1800000); // 30 min
-        
-        // Cargar primera imagen nada más empezar
-        changeBackground();
-        // Cambiar fondo cada 1 hora (3.600.000 milisegundos)
-        setInterval(changeBackground, 3600000); 
-    </script>
-</body>
-</html>
+        function actualizarFondo() {
+            var urlFoto = "https://picsum.photos/2048/1536/?random&t=" + new Date().getTime();
+            document.getElementById('fondo').style.backgroundImage = "url('" + urlFoto + "')";
+        }
+
+        function interpretarClima(codigo) {
+            if (codigo === 0) return "☀️"; 
+            if (codigo === 1 || codigo === 2 || codigo === 3) return "⛅";
+            if (codigo === 45 || codigo === 48) return "🌫️";
+            if (codigo >= 51 && codigo <= 67) return "🌧️";
+            if (codigo >= 71 && codigo <= 77) return "❄️";
+            if (codigo >= 80 && codigo <= 82) return "🌦️";
+            if (codigo >= 95) return "⛈️";
+            return "🌡️";
+        }
+
+        function actualizarClima() {
+            var lat = 36.4665;
