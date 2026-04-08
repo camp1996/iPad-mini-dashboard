@@ -165,3 +165,117 @@
                 <div class="card-title">EL PAÍS - PORTADA</div>
                 <div id="news-content" style="color:#aaa; font-size:0.8rem;">Cargando titulares...</div>
             </div>
+
+            <div class="glass-card">
+                <div class="podcast-tabs">
+                    <button class="tab-btn active" onclick="loadPodcast('1570234432', this)">Recarga Activa</button>
+                    <button class="tab-btn" onclick="loadPodcast('1642338651', this)">Chiclana</button>
+                    <button class="tab-btn" onclick="loadPodcast('359611484', this)">Reload</button>
+                </div>
+                <div id="podcast-loader" style="color:#aaa; font-size:0.8rem; text-align:center;">buscando episodio...</div>
+                <div id="podcast-content">
+                    <div class="podcast-info">
+                        <img id="podcast-img" src="" alt="">
+                        <h4 id="episode-title"></h4>
+                    </div>
+                    <audio id="audio-player" controls></audio>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 1. RELOJ, FECHA Y CUENTA ATRÁS
+        function updateAll() {
+            var now = new Date();
+            var h = now.getHours().toString().padStart(2, '0');
+            var m = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('clock').innerHTML = h + ":" + m;
+
+            var dOptions = { weekday: 'long', day: 'numeric', month: 'long' };
+            document.getElementById('date').innerHTML = now.toLocaleDateString('es-ES', dOptions).toLowerCase();
+
+            var target = new Date(now.getFullYear(), 4, 23);
+            if (now > target) target.setFullYear(now.getFullYear() + 1);
+            var diff = target - now;
+            var days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('countdown').innerHTML = "faltan " + days + " días para el 23 de mayo";
+        }
+        setInterval(updateAll, 1000);
+        updateAll();
+
+        // 2. IMAGEN DE FONDO UNSPLASH (Naturaleza y Urbana) - Rotación Diaria Garantizada
+        function setBg() {
+            var backgrounds = [
+                "https://images.unsplash.com/photo-1449824913935-59a10b8d5000?q=80&w=2048&auto=format&fit=crop", // Yosemite (Naturaleza)
+                "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2048&auto=format&fit=crop", // Chicago Skyline (Urbano)
+                "https://images.unsplash.com/photo-1470071131384-001b85755b36?q=80&w=2048&auto=format&fit=crop", // Lago y Montañas (Naturaleza)
+                "https://images.unsplash.com/photo-1480714378408-67cf736cb4d1?q=80&w=2048&auto=format&fit=crop", // NYC de noche (Urbano)
+                "https://images.unsplash.com/photo-1426604908151-3729d84e1b8c?q=80&w=2048&auto=format&fit=crop", // Bosque con niebla (Naturaleza)
+                "https://images.unsplash.com/photo-1514565131-8ca1fbf7f15f?q=80&w=2048&auto=format&fit=crop", // Tokio (Urbano)
+                "https://images.unsplash.com/photo-1501862700950-18382cd30e8f?q=80&w=2048&auto=format&fit=crop", // Cascada (Naturaleza)
+                "https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=2048&auto=format&fit=crop", // Calle de ciudad europea (Urbano)
+                "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=2048&auto=format&fit=crop", // Montaña nevada (Naturaleza)
+                "https://images.unsplash.com/photo-1496568816309-51d7c20e3b21?q=80&w=2048&auto=format&fit=crop"  // Tráfico urbano luces largas (Urbano)
+            ];
+            // Elegimos la foto dependiendo del día del mes para que cambie a diario
+            var dayOfMonth = new Date().getDate(); 
+            var index = dayOfMonth % backgrounds.length;
+            document.body.style.backgroundImage = "url('" + backgrounds[index] + "')";
+        }
+        setBg();
+
+        // 3. NOTICIAS DE ESPAÑA (El País RSS)
+        async function loadNews() {
+            try {
+                var rssUrl = 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada';
+                var res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(rssUrl));
+                var data = await res.json();
+                
+                var html = '';
+                for(var i=0; i<2; i++) {
+                    html += '<div class="news-item">' + data.items[i].title + '</div>';
+                }
+                document.getElementById('news-content').innerHTML = html;
+            } catch(e) {
+                document.getElementById('news-content').innerHTML = "No se pudieron cargar las noticias.";
+            }
+        }
+        loadNews();
+        setInterval(loadNews, 3600000); 
+
+        // 4. PODCASTS
+        async function loadPodcast(id, btn) {
+            if(btn) {
+                var btns = document.getElementsByClassName('tab-btn');
+                for(var i=0; i<btns.length; i++) btns[i].classList.remove('active');
+                btn.classList.add('active');
+            }
+            
+            document.getElementById('podcast-loader').style.display = 'block';
+            document.getElementById('podcast-content').style.display = 'none';
+            document.getElementById('audio-player').pause();
+            
+            try {
+                var r1 = await fetch("https://itunes.apple.com/lookup?id=" + id);
+                var d1 = await r1.json();
+                var feed = d1.results[0].feedUrl;
+                var img = d1.results[0].artworkUrl600;
+
+                var r2 = await fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(feed));
+                var d2 = await r2.json();
+                
+                document.getElementById('podcast-loader').style.display = 'none';
+                document.getElementById('podcast-content').style.display = 'flex';
+                document.getElementById('podcast-img').src = img;
+                document.getElementById('episode-title').innerHTML = d2.items[0].title;
+                document.getElementById('audio-player').src = d2.items[0].enclosure.link;
+            } catch(e) {
+                document.getElementById('podcast-loader').innerHTML = "Error al conectar.";
+            }
+        }
+        loadPodcast('1570234432', null);
+    </script>
+</body>
+</html>
