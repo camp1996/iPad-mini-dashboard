@@ -118,17 +118,16 @@
         #news-content { display: flex; flex-direction: column; gap: 12px; }
 
         .news-item {
-            font-size: 0.95rem;
+            font-size: 1.05rem; /* Letra un poco más grande al ser solo una noticia */
             color: #f4f4f5;
-            line-height: 1.4;
+            line-height: 1.5;
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 4; /* Permite hasta 4 líneas si el titular es largo */
             -webkit-box-orient: vertical;
             overflow: hidden;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: none; /* Quitamos la línea separadora */
+            padding-bottom: 0;
         }
-        .news-item:last-child { border-bottom: none; padding-bottom: 0; }
 
         /* TARJETA 3: PODCASTS */
         .podcast-tabs { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 8px; }
@@ -162,8 +161,8 @@
             </div>
 
             <div class="glass-card">
-                <div class="card-title">EL PAÍS - PORTADA</div>
-                <div id="news-content" style="color:#aaa; font-size:0.8rem;">Cargando titulares...</div>
+                <div class="card-title">EL PAÍS - ÚLTIMA HORA</div>
+                <div id="news-content" style="color:#aaa; font-size:0.8rem;">Cargando titular...</div>
             </div>
 
             <div class="glass-card">
@@ -205,41 +204,39 @@
         setInterval(updateAll, 1000);
         updateAll();
 
-        // 2. IMAGEN DE FONDO UNSPLASH (Naturaleza y Urbana) - Rotación Diaria Garantizada
+        // 2. IMAGEN DE FONDO UNSPLASH (Naturaleza y Urbana)
         function setBg() {
             var backgrounds = [
-                "https://images.unsplash.com/photo-1449824913935-59a10b8d5000?q=80&w=2048&auto=format&fit=crop", // Yosemite (Naturaleza)
-                "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2048&auto=format&fit=crop", // Chicago Skyline (Urbano)
-                "https://images.unsplash.com/photo-1470071131384-001b85755b36?q=80&w=2048&auto=format&fit=crop", // Lago y Montañas (Naturaleza)
-                "https://images.unsplash.com/photo-1480714378408-67cf736cb4d1?q=80&w=2048&auto=format&fit=crop", // NYC de noche (Urbano)
-                "https://images.unsplash.com/photo-1426604908151-3729d84e1b8c?q=80&w=2048&auto=format&fit=crop", // Bosque con niebla (Naturaleza)
-                "https://images.unsplash.com/photo-1514565131-8ca1fbf7f15f?q=80&w=2048&auto=format&fit=crop", // Tokio (Urbano)
-                "https://images.unsplash.com/photo-1501862700950-18382cd30e8f?q=80&w=2048&auto=format&fit=crop", // Cascada (Naturaleza)
-                "https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=2048&auto=format&fit=crop", // Calle de ciudad europea (Urbano)
-                "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=2048&auto=format&fit=crop", // Montaña nevada (Naturaleza)
-                "https://images.unsplash.com/photo-1496568816309-51d7c20e3b21?q=80&w=2048&auto=format&fit=crop"  // Tráfico urbano luces largas (Urbano)
+                "https://images.unsplash.com/photo-1449824913935-59a10b8d5000?q=80&w=2048&auto=format&fit=crop", 
+                "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2048&auto=format&fit=crop", 
+                "https://images.unsplash.com/photo-1470071131384-001b85755b36?q=80&w=2048&auto=format&fit=crop", 
+                "https://images.unsplash.com/photo-1480714378408-67cf736cb4d1?q=80&w=2048&auto=format&fit=crop", 
+                "https://images.unsplash.com/photo-1426604908151-3729d84e1b8c?q=80&w=2048&auto=format&fit=crop", 
+                "https://images.unsplash.com/photo-1514565131-8ca1fbf7f15f?q=80&w=2048&auto=format&fit=crop", 
+                "https://images.unsplash.com/photo-1501862700950-18382cd30e8f?q=80&w=2048&auto=format&fit=crop", 
+                "https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=2048&auto=format&fit=crop", 
+                "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=2048&auto=format&fit=crop", 
+                "https://images.unsplash.com/photo-1496568816309-51d7c20e3b21?q=80&w=2048&auto=format&fit=crop"  
             ];
-            // Elegimos la foto dependiendo del día del mes para que cambie a diario
             var dayOfMonth = new Date().getDate(); 
             var index = dayOfMonth % backgrounds.length;
             document.body.style.backgroundImage = "url('" + backgrounds[index] + "')";
         }
         setBg();
 
-        // 3. NOTICIAS DE ESPAÑA (El País RSS)
+        // 3. NOTICIAS DE ESPAÑA (El País RSS) - SOLO 1 NOTICIA
         async function loadNews() {
             try {
                 var rssUrl = 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada';
                 var res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(rssUrl));
                 var data = await res.json();
                 
-                var html = '';
-                for(var i=0; i<2; i++) {
-                    html += '<div class="news-item">' + data.items[i].title + '</div>';
-                }
+                // Extraemos únicamente el primer titular (índice 0)
+                var html = '<div class="news-item">' + data.items[0].title + '</div>';
+                
                 document.getElementById('news-content').innerHTML = html;
             } catch(e) {
-                document.getElementById('news-content').innerHTML = "No se pudieron cargar las noticias.";
+                document.getElementById('news-content').innerHTML = "No se pudo cargar la noticia.";
             }
         }
         loadNews();
