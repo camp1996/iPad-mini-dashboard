@@ -55,13 +55,15 @@
             border-radius: 25px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             width: 380px;
+            height: 420px; /* Altura fija */
+            box-sizing: border-box;
         }
 
         /* Botones para cambiar de podcast */
         .podcast-tabs {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             gap: 10px;
         }
 
@@ -83,6 +85,55 @@
             font-weight: bold;
         }
 
+        /* Estilos del reproductor nativo */
+        #native-player-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        #podcast-content {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        #podcast-img {
+            width: 160px;
+            height: 160px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        #episode-title {
+            font-size: 0.95rem;
+            color: #fff;
+            margin: 0 0 15px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+            line-height: 1.4;
+        }
+
+        audio {
+            width: 100%;
+            height: 40px;
+            outline: none;
+        }
+
+        #loading-msg {
+            color: #a1a1aa;
+            font-size: 0.9rem;
+        }
+
+        /* Estilos del reloj */
         #greeting { font-size: 1.5rem; color: #e4e4e7; font-weight: 500; margin-bottom: -10px;}
         #clock { font-size: 7rem; font-weight: 700; letter-spacing: -2px; margin: 0; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         #date { font-size: 1.5rem; color: #d4d4d8; font-weight: 400; text-transform: capitalize; margin-bottom: 20px; }
@@ -108,15 +159,24 @@
 
     <div class="podcast-card">
         <div class="podcast-tabs">
-            <button class="tab-btn active" onclick="changePodcast('https://embed.podcasts.apple.com/es/podcast/recarga-activa/id1570234432?theme=dark', this)">Recarga Activa</button>
-            <button class="tab-btn" onclick="changePodcast('https://embed.podcasts.apple.com/es/podcast/chiclana-friends/id1642338651?theme=dark', this)">Chiclana & Friends</button>
-            <button class="tab-btn" onclick="changePodcast('https://embed.podcasts.apple.com/es/podcast/podcast-reload/id359611484?theme=dark', this)">Reload</button>
+            <button class="tab-btn active" onclick="loadPodcast('1570234432', this)">Recarga Activa</button>
+            <button class="tab-btn" onclick="loadPodcast('1642338651', this)">Chiclana & Friends</button>
+            <button class="tab-btn" onclick="loadPodcast('359611484', this)">Reload</button>
         </div>
 
-        <iframe id="podcast-player" frameborder="0" height="400" style="width:100%;max-width:660px;overflow:hidden;background:transparent;" src="https://embed.podcasts.apple.com/es/podcast/recarga-activa/id1570234432?theme=dark"></iframe>
+        <div id="native-player-container">
+            <p id="loading-msg">Buscando último episodio...</p>
+            
+            <div id="podcast-content">
+                <img id="podcast-img" src="" alt="Portada del Podcast">
+                <h4 id="episode-title">Título del episodio</h4>
+                <audio id="audio-player" controls preload="metadata"></audio>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Actualizar Reloj
+        // === 1. RELOJ Y FECHA ===
         function updateTime() {
             const now = new Date();
             let hours = now.getHours().toString().padStart(2, '0');
@@ -135,7 +195,7 @@
         }
         setInterval(updateTime, 1000); updateTime();
 
-        // Obtener Imagen NASA
+        // === 2. IMAGEN DE LA NASA ===
         async function fetchNasaImage() {
             try {
                 const response = await fetch('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY');
@@ -151,13 +211,53 @@
         }
         fetchNasaImage(); setInterval(fetchNasaImage, 12 * 60 * 60 * 1000);
 
-        // Cambiar de Podcast
-        function changePodcast(url, buttonElement) {
-            document.getElementById('podcast-player').src = url;
-            const buttons = document.querySelectorAll('.tab-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            buttonElement.classList.add('active');
+        // === 3. REPRODUCTOR DE PODCASTS NATIVO ===
+        async function loadPodcast(appleId, buttonElement) {
+            // Estilo visual del botón activo
+            if(buttonElement) {
+                const buttons = document.querySelectorAll('.tab-btn');
+                buttons.forEach(btn => btn.classList.remove('active'));
+                buttonElement.classList.add('active');
+            }
+
+            // Preparar UI para carga
+            document.getElementById('loading-msg').style.display = 'block';
+            document.getElementById('loading-msg').textContent = 'Buscando último episodio...';
+            document.getElementById('podcast-content').style.display = 'none';
+            document.getElementById('audio-player').pause();
+
+            try {
+                // Paso A: Pedirle a la API de Apple la información del Podcast según su ID
+                const appleRes = await fetch(`https://itunes.apple.com/lookup?id=${appleId}`);
+                const appleData = await appleRes.json();
+                const feedUrl = appleData.results[0].feedUrl;
+                const artwork = appleData.results[0].artworkUrl600;
+
+                // Paso B: Convertir el feed RSS del podcast en datos que el iPad pueda leer (JSON)
+                const rssRes = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`);
+                const rssData = await rssRes.json();
+                
+                // Coger el episodio más reciente
+                const latestEpisode = rssData.items[0];
+                
+                // Paso C: Mostrar la portada, título y cargar el audio en el reproductor nativo
+                document.getElementById('loading-msg').style.display = 'none';
+                document.getElementById('podcast-content').style.display = 'flex';
+                
+                document.getElementById('podcast-img').src = artwork;
+                document.getElementById('episode-title').textContent = latestEpisode.title;
+                
+                const audio = document.getElementById('audio-player');
+                audio.src = latestEpisode.enclosure.link; // El MP3 directo
+                
+            } catch(error) {
+                document.getElementById('loading-msg').textContent = 'Error al cargar. Intenta de nuevo.';
+                console.error("Error cargando podcast:", error);
+            }
         }
+
+        // Cargar "Recarga Activa" por defecto al abrir la pantalla
+        loadPodcast('1570234432', null);
     </script>
 </body>
 </html>
