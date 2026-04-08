@@ -20,7 +20,7 @@
             background-size: cover;
             background-position: center;
             transition: background-image 2s ease-in-out;
-            gap: 40px; /* Separación entre el reloj y los podcasts */
+            gap: 40px; 
         }
 
         .overlay {
@@ -54,7 +54,7 @@
             padding: 20px;
             border-radius: 25px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            width: 350px;
+            width: 380px;
         }
 
         /* Botones para cambiar de podcast */
@@ -69,12 +69,13 @@
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
-            padding: 10px 15px;
+            padding: 10px;
             border-radius: 12px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             flex-grow: 1;
             transition: background 0.3s;
+            text-align: center;
         }
 
         .tab-btn:hover, .tab-btn.active {
@@ -107,12 +108,12 @@
 
     <div class="podcast-card">
         <div class="podcast-tabs">
-            <button class="tab-btn active" onclick="changePodcast('https://podcasts.apple.com/es/podcast/podcast-reload/id359611484?theme=dark', this)">Videojuegos</button>
-            <button class="tab-btn" onclick="changePodcast('https://podcasts.apple.com/es/podcast/chiclana-friends/id1642338651?theme=dark', this)">Podcast</button>
-            <button class="tab-btn" onclick="changePodcast('https://podcasts.apple.com/es/podcast/recarga-activa/id1570234432?theme=dark', this)">Tecnología</button>
+            <button class="tab-btn active" onclick="changePodcast('https://embed.podcasts.apple.com/es/podcast/recarga-activa/id1570234432?theme=dark', this)">Recarga Activa</button>
+            <button class="tab-btn" onclick="changePodcast('https://embed.podcasts.apple.com/es/podcast/chiclana-friends/id1642338651?theme=dark', this)">Chiclana & Friends</button>
+            <button class="tab-btn" onclick="changePodcast('https://embed.podcasts.apple.com/es/podcast/podcast-reload/id359611484?theme=dark', this)">Reload</button>
         </div>
 
-        <iframe id="podcast-player" allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="400" style="width:100%;max-width:660px;overflow:hidden;background:transparent;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.podcasts.apple.com/es/podcast/entiende-tu-mente/id1229953835?theme=dark"></iframe>
+        <iframe id="podcast-player" allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="400" style="width:100%;max-width:660px;overflow:hidden;background:transparent;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.podcasts.apple.com/es/podcast/recarga-activa/id1570234432?theme=dark"></iframe>
     </div>
 
     <script>
@@ -153,14 +154,9 @@
 
         // Cambiar de Podcast
         function changePodcast(url, buttonElement) {
-            // Cambiar la URL del iframe
             document.getElementById('podcast-player').src = url;
-            
-            // Quitar la clase 'active' de todos los botones
             const buttons = document.querySelectorAll('.tab-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
-            
-            // Poner la clase 'active' al botón pulsado para que brille más
             buttonElement.classList.add('active');
         }
     </script>
