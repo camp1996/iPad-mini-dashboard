@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Dashboard Mini (Reloj Grande)</title>
+    <title>Dashboard Mini iPad</title>
     <style>
         body, html {
             margin: 0;
@@ -73,7 +73,6 @@
             color: #f0f0f0;
         }
 
-        /* --- NUEVO ESTILO PARA LA CUENTA ATRÁS --- */
         #cuenta-atras {
             font-size: 1.5em;
             font-weight: 300;
@@ -82,7 +81,6 @@
             background: rgba(0, 0, 0, 0.2);
             padding: 8px 18px;
             border-radius: 20px;
-            backdrop-filter: blur(4px);
         }
 
         #clima {
@@ -90,9 +88,11 @@
             font-weight: 300;
             margin-top: 20px;
             color: #e0e0e0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            /* Eliminado el 'gap' que da problemas en iOS antiguo */
+        }
+        
+        #icono-clima {
+            margin-right: 10px; /* Alternativa compatible al gap */
         }
     </style>
 </head>
@@ -104,12 +104,18 @@
     <div id="contenido">
         <div id="saludo">Hola</div>
         <div id="reloj">--:--</div>
-        <div id="fecha">Cargando...</div>
+        <div id="fecha">Iniciando sistema...</div>
         <div id="cuenta-atras">Calculando días...</div>
-        <div id="clima">Cargando clima...</div>
+        <div id="clima"><span id="icono-clima"></span><span id="texto-clima">Cargando clima...</span></div>
     </div>
 
     <script>
+        // CHIVATO DE ERRORES PARA EL IPAD
+        window.onerror = function(mensaje, url, linea) {
+            document.getElementById('fecha').innerHTML = "Error línea " + linea + ": " + mensaje;
+            return false;
+        };
+
         function actualizarReloj() {
             var ahora = new Date();
             var horas = ahora.getHours();
@@ -126,17 +132,15 @@
 
             var opciones = { weekday: 'long', month: 'long', day: 'numeric' };
             var fechaFormateada = ahora.toLocaleDateString('es-ES', opciones);
+            // Hacemos la primera letra mayúscula de forma segura
             fechaFormateada = fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
             document.getElementById('fecha').innerHTML = fechaFormateada;
         }
 
-        // --- NUEVA FUNCIÓN PARA LA CUENTA ATRÁS ---
         function actualizarCuentaAtras() {
-            // El mes en JavaScript va de 0 (Enero) a 11 (Diciembre), por eso Mayo es el 4.
             var fechaObjetivo = new Date(2026, 4, 23); 
             var ahora = new Date();
             
-            // Ignoramos las horas para calcular solo días exactos de diferencia
             ahora.setHours(0, 0, 0, 0);
             fechaObjetivo.setHours(0, 0, 0, 0);
 
@@ -151,7 +155,7 @@
             } else if (diasRestantes === 0) {
                 elemento.innerHTML = "🎉 ¡Hoy es 23 de mayo de 2026!";
             } else {
-                elemento.innerHTML = "⌛ El 23 de mayo de 2026 ya pasó";
+                elemento.innerHTML = "⌛ El 23 de mayo ya pasó";
             }
         }
 
@@ -168,8 +172,3 @@
             if (codigo >= 71 && codigo <= 77) return "❄️";
             if (codigo >= 80 && codigo <= 82) return "🌦️";
             if (codigo >= 95) return "⛈️";
-            return "🌡️";
-        }
-
-        function actualizarClima() {
-            var lat = 36.4665;
