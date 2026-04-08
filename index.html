@@ -2,12 +2,23 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Apple_gray_logo.png/1024px-Apple_gray_logo.png">
+
     <title>Dashboard iPad</title>
     <style>
+        /* Forzamos que el fondo más profundo del navegador sea NEGRO siempre */
+        html {
+            background-color: #000000;
+        }
+
         /* Fondo base y capa oscura */
         body {
-            background-color: #000;
+            background-color: #000000;
             color: #ffffff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
             margin: 0;
@@ -25,7 +36,7 @@
         .overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* Un poco más oscuro para que la hora destaque más */
+            background: rgba(0, 0, 0, 0.5); 
             z-index: -1;
         }
 
@@ -46,7 +57,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: -50px; /* Lo subimos un poquito para compensar los widgets de abajo */
+            margin-top: -50px; 
             text-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
@@ -85,7 +96,7 @@
             border-radius: 25px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            padding: 15px;
+            padding: 20px; 
         }
 
         /* Tiempo (Izquierda) */
@@ -93,9 +104,9 @@
             width: 250px;
         }
 
-        /* Podcasts (Derecha) - Diseño Compacto */
+        /* Podcasts (Derecha) - Diseño Ajustado y Más Grande */
         .podcast-card {
-            width: 320px;
+            width: 400px; 
             display: flex;
             flex-direction: column;
         }
@@ -103,18 +114,18 @@
         .podcast-tabs {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
-            gap: 8px;
+            margin-bottom: 20px; 
+            gap: 10px;
         }
 
         .tab-btn {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.15);
             color: #fff;
-            padding: 8px 5px;
-            border-radius: 8px;
+            padding: 10px 8px; 
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 0.75rem;
+            font-size: 0.85rem; 
             flex-grow: 1;
             transition: background 0.3s;
             text-align: center;
@@ -137,44 +148,43 @@
             width: 100%;
         }
 
-        /* Nueva disposición horizontal para imagen y título */
         .podcast-info {
             display: flex;
             flex-direction: row;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 12px;
+            gap: 18px;
+            margin-bottom: 15px;
         }
 
         #podcast-img {
-            width: 65px;
-            height: 65px;
-            border-radius: 12px;
+            width: 90px; 
+            height: 90px;
+            border-radius: 15px;
             object-fit: cover;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
         #episode-title {
-            font-size: 0.85rem;
+            font-size: 1rem; 
             color: #e4e4e7;
             margin: 0;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;  
             overflow: hidden;
-            line-height: 1.3;
+            line-height: 1.4;
             text-align: left;
         }
 
         audio {
             width: 100%;
-            height: 35px;
+            height: 42px; 
             outline: none;
         }
 
         #loading-msg {
             color: #a1a1aa;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             text-align: center;
             margin: 20px 0;
         }
@@ -227,7 +237,6 @@
             let minutes = now.getMinutes().toString().padStart(2, '0');
             document.getElementById('clock').textContent = `${hours}:${minutes}`;
 
-            // Formato de fecha solicitado: "miércoles, 8 de abril" (todo minúsculas)
             const options = { weekday: 'long', day: 'numeric', month: 'long' };
             let dateString = now.toLocaleDateString('es-ES', options).toLowerCase();
             document.getElementById('date').textContent = dateString;
@@ -288,7 +297,7 @@
             }
         }
 
-        // Cargar "Recarga Activa" por defecto
+        // Cargar Recarga Activa por defecto al abrir
         loadPodcast('1570234432', null);
     </script>
 </body>
