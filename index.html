@@ -28,7 +28,7 @@
         .overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4); /* Capa oscura para que se lea bien el texto */
+            background: rgba(0, 0, 0, 0.45); 
             z-index: -1;
         }
 
@@ -37,7 +37,7 @@
             top: 20px; 
             left: 20px; 
             font-size: 0.8rem; 
-            color: rgba(255,255,255,0.5); 
+            color: rgba(255,255,255,0.4); 
         }
 
         .center-clock {
@@ -58,6 +58,7 @@
             margin-top: 15px;
             background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             padding: 6px 18px;
             border-radius: 20px;
             border: 1px solid rgba(255, 159, 10, 0.4);
@@ -79,7 +80,6 @@
             -webkit-backdrop-filter: blur(15px);
             border-radius: 25px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             padding: 20px; 
             box-sizing: border-box;
         }
@@ -112,7 +112,7 @@
 <body>
 
     <div class="overlay"></div>
-    <div id="info-tag" class="info-tag">paisaje del día</div>
+    <div id="info-tag" class="info-tag">paisaje diario</div>
 
     <div class="center-clock">
         <div id="clock">00:00</div>
@@ -159,43 +159,9 @@
         }
         setInterval(updateTime, 1000); updateTime();
 
-        // NUEVA FUNCIÓN: Paisaje Diario (Naturaleza y Urbano)
-        async function fetchDailyImage() {
+        // NUEVA FUNCIÓN DE IMAGEN DIARIA (API ACTUALIZADA)
+        function fetchDailyImage() {
             const now = new Date();
-            // Creamos una "semilla" basada en el día actual (ej: 2024-04-08)
-            // Esto obliga a Unsplash a dar la misma foto durante todo el día
-            const dateSeed = now.toISOString().split('T')[0];
-            const categories = "nature,landscape,city,architecture";
-            const imgUrl = `https://source.unsplash.com/featured/2048x1536?${categories}&sig=${dateSeed}`;
-
-            const tempImg = new Image();
-            tempImg.src = imgUrl;
-            tempImg.onload = () => {
-                document.body.style.backgroundImage = `url('${imgUrl}')`;
-            };
-        }
-        fetchDailyImage();
-
-        async function loadPodcast(appleId, buttonElement) {
-            if(buttonElement) {
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                buttonElement.classList.add('active');
-            }
-            document.getElementById('loading-msg').style.display = 'block';
-            document.getElementById('podcast-content').style.display = 'none';
-            try {
-                const appleRes = await fetch(`https://itunes.apple.com/lookup?id=${appleId}`);
-                const appleData = await appleRes.json();
-                const rssRes = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(appleData.results[0].feedUrl)}`);
-                const rssData = await rssRes.json();
-                document.getElementById('loading-msg').style.display = 'none';
-                document.getElementById('podcast-content').style.display = 'flex';
-                document.getElementById('podcast-img').src = appleData.results[0].artworkUrl600;
-                document.getElementById('episode-title').textContent = rssData.items[0].title;
-                document.getElementById('audio-player').src = rssData.items[0].enclosure.link;
-            } catch(e) {}
-        }
-        loadPodcast('1570234432', null);
-    </script>
-</body>
-</html>
+            const seed = now.getFullYear() + "" + now.getMonth() + "" + now.getDate();
+            // Nueva URL de Unsplash que permite usar una "seed" para que la foto sea la misma todo el día
+            const imgUrl = `
