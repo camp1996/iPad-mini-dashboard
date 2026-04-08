@@ -89,17 +89,16 @@
             text-shadow: 0 2px 10px rgba(0,0,0,0.9);
         }
 
-        .right-column {
+       .right-column {
             width: 340px;
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
             justify-content: center; 
-            gap: 100px; /* <--- Ahora este número mandará de verdad */
-            height: auto; /* <--- CAMBIA '100%' POR 'auto' */
+            /* Hemos quitado el gap de aquí */
         }
 
-        .glass-card { 
+       .glass-card { 
             background: rgba(0, 0, 0, 0.45); 
             backdrop-filter: blur(20px); 
             -webkit-backdrop-filter: blur(20px); 
@@ -108,7 +107,12 @@
             padding: 25px; 
             box-sizing: border-box; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            
+            margin-bottom: 30px; /* <--- CAMBIA ESTE NÚMERO PARA DAR ESPACIO */
         }
+
+        /* Esto quita el margen a la última tarjeta para que el bloque quede centrado */
+        .glass-card:last-child { margin-bottom: 0; }
 
         .card-title {
             font-size: 0.85rem;
