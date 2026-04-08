@@ -11,12 +11,10 @@
 
     <title>Dashboard iPad</title>
     <style>
-        /* Forzamos que el fondo más profundo del navegador sea NEGRO siempre */
         html {
             background-color: #000000;
         }
 
-        /* Fondo base y capa oscura */
         body {
             background-color: #000000;
             color: #ffffff;
@@ -40,7 +38,6 @@
             z-index: -1;
         }
 
-        /* Título de la NASA (arriba a la izquierda) */
         .nasa-title { 
             position: absolute; 
             top: 20px; 
@@ -51,33 +48,34 @@
         }
 
         /* =========================================
-           ZONA CENTRAL: RELOJ Y FECHA GIGANTES
+           ZONA CENTRAL: RELOJ Y FECHA
            ========================================= */
         .center-clock {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: -50px; 
+            /* Subimos el reloj mucho más arriba para que no estorbe a las tarjetas */
+            margin-top: -150px; 
             text-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
         #clock { 
-            font-size: 11rem; 
+            font-size: 14rem; /* Reloj mucho más grande */
             font-weight: 700; 
-            letter-spacing: -4px; 
+            letter-spacing: -5px; 
             margin: 0; 
             line-height: 1;
         }
         
         #date { 
-            font-size: 2rem; 
+            font-size: 2.2rem; /* Fecha un pelín más grande para acompañar */
             color: #d4d4d8; 
             font-weight: 300; 
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
         /* =========================================
-           ZONA INFERIOR: WIDGETS
+           ZONA INFERIOR: WIDGETS SIMÉTRICOS
            ========================================= */
         .bottom-widgets {
             position: absolute;
@@ -88,7 +86,6 @@
             align-items: flex-end;
         }
 
-        /* Tarjetas estilo cristal (Glassmorphism) */
         .glass-card {
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(15px);
@@ -97,16 +94,16 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             padding: 20px; 
+            box-sizing: border-box;
         }
 
-        /* Tiempo (Izquierda) */
+        /* Ambas tarjetas tienen exactamente el mismo ancho (Simetría) */
         .weather-card {
-            width: 250px;
+            width: 360px;
         }
 
-        /* Podcasts (Derecha) - Diseño Ajustado y Más Grande */
         .podcast-card {
-            width: 400px; 
+            width: 360px; 
             display: flex;
             flex-direction: column;
         }
@@ -122,10 +119,10 @@
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.15);
             color: #fff;
-            padding: 10px 8px; 
+            padding: 10px 6px; 
             border-radius: 10px;
             cursor: pointer;
-            font-size: 0.85rem; 
+            font-size: 0.8rem; 
             flex-grow: 1;
             transition: background 0.3s;
             text-align: center;
@@ -157,15 +154,15 @@
         }
 
         #podcast-img {
-            width: 90px; 
-            height: 90px;
+            width: 85px; 
+            height: 85px;
             border-radius: 15px;
             object-fit: cover;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
         #episode-title {
-            font-size: 1rem; 
+            font-size: 0.95rem; 
             color: #e4e4e7;
             margin: 0;
             display: -webkit-box;
@@ -216,7 +213,6 @@
 
             <div id="native-player-container">
                 <p id="loading-msg">Buscando episodio...</p>
-                
                 <div id="podcast-content">
                     <div class="podcast-info">
                         <img id="podcast-img" src="" alt="Portada">
@@ -259,7 +255,7 @@
         }
         fetchNasaImage(); setInterval(fetchNasaImage, 12 * 60 * 60 * 1000);
 
-        // === 3. REPRODUCTOR DE PODCASTS NATIVO ===
+        // === 3. REPRODUCTOR DE PODCASTS ===
         async function loadPodcast(appleId, buttonElement) {
             if(buttonElement) {
                 const buttons = document.querySelectorAll('.tab-btn');
